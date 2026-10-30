@@ -997,7 +997,12 @@ def main():
                     + object_print_gn_arg(Path("v8"))
                     + linux_legacy_gn_args
                     + windows_warning_policy_gn_arg(Path("v8"))
-                    + (windows_linker_arg(Path("v8")) if os_name == "Windows" else ""),
+                    + (windows_linker_arg(Path("v8")) if os_name == "Windows" else "")
+                    + "".join(
+                        a.strip() + "\n"
+                        for a in os.environ.get("JSC2JS_EXTRA_GN_ARGS", "").split(";")
+                        if a.strip()
+                    ),
                     encoding="utf-8",
                     newline="\n",
                 )

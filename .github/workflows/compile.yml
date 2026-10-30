@@ -13,6 +13,11 @@ on:
         required: false
         default: ""
         type: string
+      extra_gn_args:
+        description: "Extra gn args, ';'-separated (e.g. v8_enable_i18n_support=false;v8_enable_sandbox=false)"
+        required: false
+        default: ""
+        type: string
       audit_only:
         description: "Upload only validation records, not d8 binaries"
         required: false
@@ -47,6 +52,7 @@ jobs:
       # Validation batches stay within one audited API family. Reusing Ninja
       # outputs makes tags 2-3 incremental while `gn gen` still runs per tag.
       KEEP_WORK_DIR: "1"
+      JSC2JS_EXTRA_GN_ARGS: ${{ inputs.extra_gn_args }}
     steps:
       - name: Checkout infra repo
         uses: actions/checkout@v4
