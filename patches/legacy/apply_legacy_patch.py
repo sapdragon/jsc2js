@@ -480,7 +480,24 @@ void Shell::LoadJSC(const FunctionCallbackInfo<Value>& args) {{
 
       auto bytecode = i::handle({get_bytecode}, isolate);
       std::cout << "\\nStart SharedFunctionInfo\\n";
-      current->SharedFunctionInfoPrint(std::cout);
+      {{
+        char hex_buf[32];
+        std::snprintf(hex_buf, sizeof(hex_buf), "0x%016" V8PRIxPTR,
+                      static_cast<i::Address>(current->ptr()));
+        std::cout << hex_buf << ": [SharedFunctionInfo]\\n";
+        i::Address sinfo_addr = static_cast<i::Address>(
+            current->scope_info().ptr());
+        std::snprintf(hex_buf, sizeof(hex_buf), "0x%016" V8PRIxPTR,
+                      sinfo_addr);
+        std::cout << " - scope info: " << hex_buf << "\\n";
+        if (current->HasOuterScopeInfo()) {{
+          i::Address osinfo_addr = static_cast<i::Address>(
+              current->GetOuterScopeInfo().ptr());
+          std::snprintf(hex_buf, sizeof(hex_buf), "0x%016" V8PRIxPTR,
+                        osinfo_addr);
+          std::cout << " - outer scope info: " << hex_buf << "\\n";
+        }}
+      }}
       std::cout << "\\nStart BytecodeArray\\n";
       bytecode->Disassemble(std::cout);
       std::cout << "\\nEnd BytecodeArray\\n";
@@ -504,6 +521,8 @@ def patch_d8_cc(text: str, features: Features) -> str:
         "<iostream>",
         "<memory>",
         "<vector>",
+        "<cstdio>",
+        '"src/base/macros.h"',
     ):
         text = _ensure_include(text, include)
 
